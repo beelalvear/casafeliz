@@ -800,7 +800,7 @@ let viewYear, viewMonth;
 // JSONP para GET (evita CORS desde GitHub Pages)
 function apiGet(params) {
   return new Promise((resolve, reject) => {
-    const cbName = 'cb_' + Date.now();
+    const cbName = 'cb_' + Date.now() + '_' + Math.floor(Math.random()*100000);
     const url = new URL(API);
     Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
     url.searchParams.set('callback', cbName);
@@ -808,16 +808,30 @@ function apiGet(params) {
     const script = document.createElement('script');
     script.src = url.toString();
 
-    const timer = setTimeout(() => {
-      delete window[cbName];
-      document.body.removeChild(script);
-      reject(new Error('Timeout'));
-    }, 15000);
-
-    window[cbName] = (data) => {
+    let terminado = false;
+    const limpiar = () => {
+      terminado = true;
       clearTimeout(timer);
       delete window[cbName];
-      document.body.removeChild(script);
+      if (script.parentNode) script.parentNode.removeChild(script);
+    };
+
+    const timer = setTimeout(() => {
+      if (terminado) return;
+      limpiar();
+      reject(new Error('TIMEOUT: Google no respondió en 20s. Revisa que el despliegue esté activo y con acceso "Cualquier persona".'));
+    }, 20000);
+
+    // si el script no carga (404, red caída, despliegue borrado) falla rápido
+    script.onerror = () => {
+      if (terminado) return;
+      limpiar();
+      reject(new Error('NO CARGA: la URL del Apps Script no respondió. Puede estar archivada o mal desplegada.'));
+    };
+
+    window[cbName] = (data) => {
+      if (terminado) return;
+      limpiar();
       resolve(data);
     };
 
@@ -848,7 +862,10 @@ async function cargarDatos() {
     } else {
       toast('Error: ' + (r.error || 'desconocido'));
     }
-  } catch(e) { toast('Error conectando con Google Sheets'); console.error(e); }
+  } catch(e) {
+    toast(e.message || 'Error conectando con Google Sheets');
+    console.error('[CasaFeliz] Fallo al cargar:', e);
+  }
   setLoading(false);
   render();
 }
@@ -872,8 +889,32 @@ function fmt(n) {
   return '$' + Math.abs(n).toLocaleString('es-CO');
 }
 
+// Normaliza cualquier fecha a "YYYY-MM-DD"
+function normFecha(d) {
+  if (!d) return '';
+  const s = String(d);
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (m) return m[1];
+  const dt = new Date(s);
+  if (isNaN(dt)) return '';
+  return dt.getFullYear() + '-' +
+         String(dt.getMonth()+1).padStart(2,'0') + '-' +
+         String(dt.getDate()).padStart(2,'0');
+}
+
 function fmtDate(d) {
-  return new Date(d+'T00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'});
+  const n = normFecha(d);
+  if (!n) return '—';
+  const [y,m,dd] = n.split('-').map(Number);
+  return new Date(y, m-1, dd).toLocaleDateString('es-CO',
+    { day:'numeric', month:'short', year:'numeric' });
+}
+
+// Suma los gastos de un mes "YYYY-MM"
+function gastosDelMes(mes) {
+  return gastos
+    .filter(g => normFecha(g.fecha).startsWith(mes))
+    .reduce((a,g) => a + (Number(g.monto)||0), 0);
 }
 
 const COLORS = ['#3B82F6','#22C55E','#8B5CF6','#F59E0B','#EF4444','#EC4899','#14B8A6','#F97316'];
@@ -962,12 +1003,9 @@ function renderResumen() {
   const currentDay = isCurrentMonth ? now.getDate() : 32;
   const key = currentKey();
 
-  const totalPagos = personas.filter(p => pagos[p.id]).length;
-  const recaudado = totalPagos * CUOTA;
-  const totalGastado = gastos.reduce((a,g) => a + g.monto, 0);
-  const totalRecaudadoHist = Object.keys(pagos).length * CUOTA;
-  const caja = (personas.filter(p=>pagos[p.id]).length * CUOTA) - gastos.filter(g=>g.fecha.startsWith(key)).reduce((a,g)=>a+g.monto,0);
-  const gastadoMes = gastos.filter(g=>g.fecha.startsWith(key)).reduce((a,g)=>a+g.monto,0);
+  // cuenta solo a las personas que realmente están marcadas como pagadas
+  const totalPagos = personas.filter(p => pagos[p.id] === true).length;
+  const gastadoMes = gastosDelMes(key);
 
   const sinLimpiar = personas.filter(p => {
     if (limpieza[p.id]) return false;
@@ -978,7 +1016,6 @@ function renderResumen() {
   });
   const totalLimpieza = sinLimpiar.length * LIMPIEZA_FEE;
 
-  // caja real = historico necesita datos de todos los meses; mostramos balance del mes
   const totalRecaudadoReal = totalPagos * CUOTA;
   const cajaReal = totalRecaudadoReal - gastadoMes;
 
@@ -1165,7 +1202,9 @@ function renderGastos() {
     tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">🧺</div>Sin gastos registrados</div></td></tr>`;
     return;
   }
-  const sorted = [...gastos].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  const sorted = [...gastos]
+    .filter(g => normFecha(g.fecha))
+    .sort((a,b) => normFecha(b.fecha).localeCompare(normFecha(a.fecha)));
   tbody.innerHTML = sorted.map(g => `
     <tr>
       <td>${fmtDate(g.fecha)}</td>
