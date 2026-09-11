@@ -606,9 +606,9 @@ input:focus, select:focus { border-color: var(--sky); background: white; }
       <div class="scard-note">balance acumulado</div>
     </div>
     <div class="scard debt">
-      <div class="scard-label">Aseo por cobrar</div>
-      <div class="scard-value" id="sum-multas">$0</div>
-      <div class="scard-note" id="sum-multas-note">personas sin limpiar</div>
+      <div class="scard-label">Limpieza por cobrar</div>
+      <div class="scard-value" id="sum-limpieza">$0</div>
+      <div class="scard-note" id="sum-limpieza-note">personas sin limpiar</div>
     </div>
   </div>
 
@@ -786,7 +786,7 @@ input:focus, select:focus { border-color: var(--sky); background: white; }
 
 const ADMIN_PASS = 'casafeliz2024';
 const CUOTA = 5000;
-const MULTA = 100000;
+const LIMPIEZA_FEE = 100000;
 const API = 'https://script.google.com/macros/s/AKfycbwFBIOivhZBDx69cFuXqZPJ9Je56tjke8LIy283H7tHPPWsV1nAcvlcQKab95AVlN4D/exec';
 
 let calYear, calMonth;
@@ -976,7 +976,7 @@ function renderResumen() {
     const { end } = weekDates(viewYear, viewMonth, w);
     return currentDay > end;
   });
-  const totalMultas = sinLimpiar.length * MULTA;
+  const totalLimpieza = sinLimpiar.length * LIMPIEZA_FEE;
 
   // caja real = historico necesita datos de todos los meses; mostramos balance del mes
   const totalRecaudadoReal = totalPagos * CUOTA;
@@ -986,8 +986,8 @@ function renderResumen() {
   document.getElementById('sum-recaudado-note').textContent = `${totalPagos} de ${personas.length} han pagado`;
   document.getElementById('sum-gastado').textContent = fmt(gastadoMes);
   document.getElementById('sum-caja').textContent = (cajaReal>=0?'+':'-') + fmt(cajaReal);
-  document.getElementById('sum-multas').textContent = fmt(totalMultas);
-  document.getElementById('sum-multas-note').textContent = `${sinLimpiar.length} persona(s) sin limpiar`;
+  document.getElementById('sum-limpieza').textContent = fmt(totalLimpieza);
+  document.getElementById('sum-limpieza-note').textContent = `${sinLimpiar.length} persona(s) sin limpiar`;
 
   const pct = personas.length ? Math.round((totalPagos/personas.length)*100) : 0;
   document.getElementById('prog-label').textContent = `${totalPagos} / ${personas.length} pagaron`;
@@ -1023,7 +1023,7 @@ function renderResumen() {
         <span class="badge ${pago?'badge-green':'badge-red'}">${pago?'✓ Pagó':'✗ No ha pagado'}</span>
         ${badgeLimpieza}
       </div>
-      ${deuda ? `<div class="person-debt" style="display:block">Multa: ${fmt(MULTA)}</div>` : ''}
+      ${deuda ? `<div class="person-debt" style="display:block">Limpieza: ${fmt(LIMPIEZA_FEE)}</div>` : ''}
     </div>`;
   }).join('');
 }
@@ -1052,7 +1052,7 @@ function renderPersonasPage() {
     let badgeLimpieza;
     if (!leToca)         badgeLimpieza = '';
     else if (limpio)     badgeLimpieza = `<span class="badge badge-green">✓ Limpió su semana</span>`;
-    else if (semanaPaso) badgeLimpieza = `<span class="badge badge-red">✗ No limpió — Paga limpieza ${fmt(MULTA)}</span>`;
+    else if (semanaPaso) badgeLimpieza = `<span class="badge badge-red">✗ No limpió — Paga limpieza ${fmt(LIMPIEZA_FEE)}</span>`;
     else                 badgeLimpieza = `<span class="badge badge-sky">⏳ Semana por realizar</span>`;
 
     return `
