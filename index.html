@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>La Casa Feliz</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://script.google.com/macros/s/AKfycbyeI9Zu-3LS6tyUJ7CbjfAKlpes6LPIdlzARICQSvKZA6p6z42qw4r5rsTYHfU9m_aw/exec');
 
 :root {
   --sky: #3B82F6;
@@ -789,7 +789,7 @@ input:focus, select:focus { border-color: var(--sky); background: white; }
 const ADMIN_PASS = 'casafeliz2024';
 const CUOTA = 5000;
 const MULTA = 100000;
-const API = 'https://script.google.com/macros/s/AKfycbw7efKKH8KoxH7eMLwi0dBVuqOlmohtao2f5L2Aq_8lmzs2hOJYNyDLToE7DJrX6PJH/exec';
+const API = 'https://script.google.com/macros/s/AKfycbyeI9Zu-3LS6tyUJ7CbjfAKlpes6LPIdlzARICQSvKZA6p6z42qw4r5rsTYHfU9m_aw/exec';
 
 let personas = [];
 let pagos    = {};
@@ -798,35 +798,58 @@ let gastos   = [];
 let isAdmin  = false;
 let viewYear, viewMonth;
 
-async function api(params) {
-  const url = new URL(API);
-  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
-  const res = await fetch(url.toString());
-  return res.json();
+// JSONP para GET (evita CORS desde GitHub Pages)
+function apiGet(params) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'cb_' + Date.now();
+    const url = new URL(API);
+    Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
+    url.searchParams.set('callback', cbName);
+
+    const script = document.createElement('script');
+    script.src = url.toString();
+
+    const timer = setTimeout(() => {
+      delete window[cbName];
+      document.body.removeChild(script);
+      reject(new Error('Timeout'));
+    }, 15000);
+
+    window[cbName] = (data) => {
+      clearTimeout(timer);
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+
+    document.body.appendChild(script);
+  });
 }
 
+// POST como GET con todos los params (Apps Script acepta ambos)
 async function apiPost(body) {
-  const res = await fetch(API, { method:'POST', body: JSON.stringify(body) });
-  return res.json();
+  return apiGet(body);
 }
 
 function setLoading(on) {
   const el = document.getElementById('loading-bar');
-  if (el) el.style.opacity = on ? '1' : '0';
+  if (el) el.style.display = on ? 'block' : 'none';
 }
 
 async function cargarDatos() {
   setLoading(true);
   try {
     const mes = mesKey(viewYear, viewMonth);
-    const r = await api({ accion:'getTodo', mes });
+    const r = await apiGet({ accion:'getTodo', mes });
     if (r.ok) {
       personas = r.personas || [];
       pagos    = r.pagos    || {};
       limpieza = r.limpieza || {};
       gastos   = r.gastos   || [];
+    } else {
+      toast('Error: ' + (r.error || 'desconocido'));
     }
-  } catch(e) { toast('Error cargando datos'); }
+  } catch(e) { toast('Error conectando con Google Sheets'); console.error(e); }
   setLoading(false);
   render();
 }
