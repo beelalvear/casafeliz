@@ -791,6 +791,7 @@ const CUOTA = 5000;
 const MULTA = 100000;
 const API = 'https://script.google.com/macros/s/AKfycbyRC7W2sFFwgSxSj5HlBY6Ku9Xd0j-k4dY_dPwDiPP8Ui685vQ_p2siYO2e8tEqlHB9/exec';
 
+let calYear, calMonth;
 let personas = [];
 let pagos    = {};
 let limpieza = {};
@@ -1019,7 +1020,6 @@ function renderPersonasPage() {
 /* ══════════════════════════════
    CALENDARIO
 ══════════════════════════════ */
-let calYear, calMonth;
 
 function calMove(dir) {
   calMonth += dir;
