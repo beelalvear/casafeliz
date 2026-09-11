@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Casa Feliz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --sky: #3B82F6;
+  --sky-light: #EFF6FF;
+  --sky-mid: #BFDBFE;
+  --green: #22C55E;
+  --green-light: #F0FDF4;
+  --red: #EF4444;
+  --red-light: #FEF2F2;
+  --amber: #F59E0B;
+  --amber-light: #FFFBEB;
+  --purple: #8B5CF6;
+  --purple-light: #F5F3FF;
+  --slate: #1E293B;
+  --slate-mid: #475569;
+  --slate-light: #94A3B8;
+  --border: #E2E8F0;
+  --bg: #F8FAFC;
+  --white: #FFFFFF;
+  --card-shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--slate);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+
+.house-logo {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--sky), #1D4ED8);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+
+.site-name {
+  font-size: 18px; font-weight: 800;
+  color: var(--slate);
+  letter-spacing: -0.4px;
+}
+
+.site-sub { font-size: 12px; color: var(--slate-light); }
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.month-badge {
+  background: var(--sky-light);
+  color: var(--sky);
+  border: 1px solid var(--sky-mid);
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.btn-admin {
+  background: var(--slate);
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── NAV TABS ── */
+.tab-nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  padding: 0 24px;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--slate-light);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: color .15s, border-color .15s;
+}
+
+.tab:hover { color: var(--slate-mid); }
+.tab.active { color: var(--sky); border-bottom-color: var(--sky); }
+
+/* ── LAYOUT ── */
+.page { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* ── SUMMARY CARDS ── */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.scard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: var(--card-shadow);
+}
+
+.scard-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate-light);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+.scard-value {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.scard-note { font-size: 12px; color: var(--slate-light); }
+
+.scard.income .scard-value { color: var(--green); }
+.scard.expense .scard-value { color: var(--red); }
+.scard.balance .scard-value { color: var(--sky); }
+.scard.debt .scard-value { color: var(--amber); }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--slate);
+  margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* ── PEOPLE GRID ── */
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.person-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.person-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.person-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: white;
+}
+
+.person-info { flex: 1; min-width: 0; }
+
+.person-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--slate);
+}
+
+.person-week {
+  font-size: 12px;
+  color: var(--slate-light);
+  margin-top: 1px;
+}
+
+.person-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-red { background: var(--red-light); color: var(--red); }
+.badge-amber { background: var(--amber-light); color: var(--amber); }
+.badge-sky { background: var(--sky-light); color: var(--sky); }
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+
+.person-debt {
+  background: var(--red-light);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--red);
+  font-weight: 700;
+  display: none;
+}
+
+/* ── CALENDAR ── */
+.cal-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 24px;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cal-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--slate);
+}
+
+.cal-arr {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--slate-mid);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+
+.cal-arr:hover { background: var(--bg); }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-dow {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--slate-light);
+  padding-bottom: 8px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: default;
+  position: relative;
+  padding: 4px;
+}
+
+.cal-day.other { color: var(--border); }
+.cal-day.today { background: var(--sky); color: white; }
+.cal-day.week-assigned { border: 2px solid var(--sky-mid); }
+
+.cal-day .week-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--sky);
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.cal-day.today .week-label { color: rgba(255,255,255,0.8); }
+
+/* legend */
+.cal-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--slate-mid);
+}
+
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+/* ── EXPENSES TABLE ── */
+.table-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 24px;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+th {
+  text-align: left;
+  padding: 11px 16px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--slate-light);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.02em;
+}
+
+td {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--bg);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #FAFBFC; }
+
+.amount-green { color: var(--green); font-weight: 700; }
+.amount-red { color: var(--red); font-weight: 700; }
+
+/* ── ADMIN PANEL ── */
+.admin-gate {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 460px;
+  margin: 0 auto;
+  box-shadow: var(--card-shadow);
+  text-align: center;
+}
+
+.admin-gate h2 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.admin-gate p { font-size: 13px; color: var(--slate-light); margin-bottom: 20px; }
+
+.admin-panel { display: none; }
+
+/* ── FORMS ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+
+label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--slate-mid);
+}
+
+input, select, textarea {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--slate);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .15s;
+}
+
+input:focus, select:focus { border-color: var(--sky); background: white; }
+
+.admin-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 18px;
+  box-shadow: var(--card-shadow);
+}
+
+.admin-section h3 {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.btn {
+  padding: 9px 18px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  transition: opacity .15s;
+}
+
+.btn:hover { opacity: 0.88; }
+.btn-sky { background: var(--sky); color: white; }
+.btn-green { background: var(--green); color: white; }
+.btn-red { background: var(--red); color: white; }
+.btn-amber { background: var(--amber); color: white; }
+.btn-ghost { background: var(--bg); color: var(--slate-mid); border: 1px solid var(--border); }
+.btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+
+/* ── PAYMENT STATUS ── */
+.pay-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bg);
+  gap: 12px;
+}
+
+.pay-row:last-child { border-bottom: none; }
+
+.pay-name { flex: 1; font-size: 14px; font-weight: 600; }
+
+.pay-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── MODAL ── */
+.modal-bg {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.45);
+  z-index: 200;
+  align-items: center; justify-content: center;
+}
+
+.modal-bg.open { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  padding: 26px;
+  width: 420px;
+  max-width: 92vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+}
+
+.modal h3 { font-size: 17px; font-weight: 800; margin-bottom: 18px; }
+
+.modal-footer {
+  display: flex; gap: 10px; margin-top: 20px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--slate);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  transform: translateY(60px); opacity: 0;
+  transition: all .3s;
+  z-index: 999;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--slate-light);
+  font-size: 14px;
+}
+
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; transition: width .4s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .summary-row { grid-template-columns: 1fr 1fr; }
+  .people-grid { grid-template-columns: 1fr; }
+  main { padding: 16px; }
+  header { padding: 0 16px; }
+  .tab-nav { padding: 0 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="house-logo">🏠</div>
+    <div>
+      <div class="site-name">La Casa Feliz</div>
+      <div class="site-sub">Portal de administración</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="month-badge" id="currentMonthBadge"></div>
+    <button class="btn-admin" onclick="openAdminLogin()">🔐 Admin</button>
+  </div>
+</header>
+
+<!-- LOADING BAR -->
+<div id="loading-bar" style="display:none;position:fixed;top:60px;left:0;right:0;height:3px;background:linear-gradient(90deg,#3B82F6 0%,#22C55E 50%,#3B82F6 100%);background-size:200%;animation:loadbar 1.2s linear infinite;z-index:99"></div>
+<style>@keyframes loadbar{0%{background-position:0%}100%{background-position:200%}}</style>
+
+<!-- TABS -->
+<nav class="tab-nav">
+  <button class="tab active" onclick="showPage('resumen')">Resumen</button>
+  <button class="tab" onclick="showPage('personas')">Personas</button>
+  <button class="tab" onclick="showPage('calendario')">Calendario</button>
+  <button class="tab" onclick="showPage('gastos')">Gastos</button>
+  <button class="tab" onclick="showPage('admin')" id="adminTab" style="display:none">⚙️ Admin</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     PAGE: RESUMEN
+══════════════════════════════════════════════ -->
+<div class="page active" id="page-resumen">
+  <div class="summary-row">
+    <div class="scard income">
+      <div class="scard-label">Recaudado este mes</div>
+      <div class="scard-value" id="sum-recaudado">$0</div>
+      <div class="scard-note" id="sum-recaudado-note">0 de 6 han pagado</div>
+    </div>
+    <div class="scard expense">
+      <div class="scard-label">Gastado este mes</div>
+      <div class="scard-value" id="sum-gastado">$0</div>
+      <div class="scard-note" id="sum-gastado-note">en productos de limpieza</div>
+    </div>
+    <div class="scard balance">
+      <div class="scard-label">Disponible en caja</div>
+      <div class="scard-value" id="sum-caja">$0</div>
+      <div class="scard-note">balance acumulado</div>
+    </div>
+    <div class="scard debt">
+      <div class="scard-label">Multas por cobrar</div>
+      <div class="scard-value" id="sum-multas">$0</div>
+      <div class="scard-note" id="sum-multas-note">personas sin limpiar</div>
+    </div>
+  </div>
+
+  <!-- mini people -->
+  <div class="section-title">Estado de personas este mes</div>
+  <div class="people-grid" id="resumen-people"></div>
+
+  <!-- progress -->
+  <div class="scard" style="margin-bottom:24px">
+    <div class="scard-label" style="margin-bottom:10px">Recaudo del mes</div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+      <span id="prog-label">0 / 6 pagaron</span>
+      <span id="prog-pct" style="font-weight:700;color:var(--sky)">0%</span>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="prog-bar" style="width:0%;background:var(--sky)"></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE: PERSONAS
+══════════════════════════════════════════════ -->
+<div class="page" id="page-personas">
+  <div class="section-title">
+    Habitantes — <span id="personas-mes" style="color:var(--slate-light);font-weight:600"></span>
+  </div>
+  <div class="people-grid" id="personas-grid"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE: CALENDARIO
+══════════════════════════════════════════════ -->
+<div class="page" id="page-calendario">
+  <div class="cal-wrap">
+    <div class="cal-nav">
+      <button class="cal-arr" onclick="calMove(-1)">‹</button>
+      <div class="cal-title" id="cal-title"></div>
+      <button class="cal-arr" onclick="calMove(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--sky)"></div> Hoy</div>
+      <div class="legend-item"><div class="legend-dot" style="border:2px solid var(--sky-mid);background:white"></div> Semana asignada</div>
+    </div>
+  </div>
+
+  <!-- weekly assignments -->
+  <div class="section-title">Asignación de semanas — <span id="cal-assign-mes" style="color:var(--slate-light);font-weight:600"></span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Semana</th><th>Fechas</th><th>Persona</th><th>Estado limpieza</th></tr></thead>
+      <tbody id="week-assign-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE: GASTOS
+══════════════════════════════════════════════ -->
+<div class="page" id="page-gastos">
+  <div class="section-title">Historial de gastos</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Fecha</th><th>Descripción</th><th>Monto</th><th>Registrado por</th></tr>
+      </thead>
+      <tbody id="gastos-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE: ADMIN
+══════════════════════════════════════════════ -->
+<div class="page" id="page-admin">
+
+  <!-- ── REGISTRO PAGO ── -->
+  <div class="admin-section">
+    <h3>💵 Registrar pago mensual</h3>
+    <div id="pay-rows"></div>
+  </div>
+
+  <!-- ── LIMPIEZA ── -->
+  <div class="admin-section">
+    <h3>🧹 Marcar limpieza realizada</h3>
+    <div id="clean-rows"></div>
+  </div>
+
+  <!-- ── GASTO ── -->
+  <div class="admin-section">
+    <h3>🛒 Registrar gasto</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" id="g-fecha">
+      </div>
+      <div class="form-group">
+        <label>Monto ($)</label>
+        <input type="number" id="g-monto" placeholder="Ej: 25000">
+      </div>
+      <div class="form-group full">
+        <label>Descripción</label>
+        <input type="text" id="g-desc" placeholder="Ej: Jabón, desinfectante, escoba...">
+      </div>
+    </div>
+    <button class="btn btn-red" onclick="saveGasto()">Registrar gasto</button>
+  </div>
+
+  <!-- ── MES ── -->
+  <div class="admin-section">
+    <h3>📅 Mes en vista</h3>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <input type="month" id="mes-selector" style="max-width:200px">
+      <button class="btn btn-sky" onclick="changeMes()">Ver este mes</button>
+      <button class="btn btn-ghost" onclick="resetToCurrentMonth()">Volver al mes actual</button>
+    </div>
+  </div>
+
+  <!-- ── PERSONAS ── -->
+  <div class="admin-section">
+    <h3>👤 Administrar personas</h3>
+    <div id="personas-admin-list" style="margin-bottom:16px"></div>
+    <button class="btn btn-sky" onclick="openAddPersona()">+ Agregar persona</button>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL: LOGIN ADMIN
+══════════════════════════════════════════════ -->
+<div class="modal-bg" id="modal-login">
+  <div class="modal">
+    <h3>🔐 Acceso administrador</h3>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Contraseña</label>
+      <input type="password" id="admin-pass" placeholder="••••••" onkeydown="if(event.key==='Enter')tryLogin()">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-login')">Cancelar</button>
+      <button class="btn btn-sky" onclick="tryLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: AGREGAR PERSONA -->
+<div class="modal-bg" id="modal-persona">
+  <div class="modal">
+    <h3>👤 Nueva persona</h3>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nombre</label>
+        <input type="text" id="p-nombre" placeholder="Nombre completo">
+      </div>
+      <div class="form-group full">
+        <label>Semana asignada para limpieza</label>
+        <select id="p-semana">
+          <option value="1">Semana 1 (días 1–7)</option>
+          <option value="2">Semana 2 (días 8–14)</option>
+          <option value="3">Semana 3 (días 15–21)</option>
+          <option value="4">Semana 4 (días 22–28/31)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-ghost" onclick="closeModal('modal-persona')">Cancelar</button>
+      <button type="button" class="btn btn-green" onclick="savePersona()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA LAYER  — Google Sheets via Apps Script
+═══════════════════════════════════════════ */
+
+const ADMIN_PASS = 'casafeliz2024';
+const CUOTA = 5000;
+const MULTA = 100000;
+const API = 'https://script.google.com/macros/s/AKfycbw7efKKH8KoxH7eMLwi0dBVuqOlmohtao2f5L2Aq_8lmzs2hOJYNyDLToE7DJrX6PJH/exec';
+
+let personas = [];
+let pagos    = {};
+let limpieza = {};
+let gastos   = [];
+let isAdmin  = false;
+let viewYear, viewMonth;
+
+async function api(params) {
+  const url = new URL(API);
+  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
+  const res = await fetch(url.toString());
+  return res.json();
+}
+
+async function apiPost(body) {
+  const res = await fetch(API, { method:'POST', body: JSON.stringify(body) });
+  return res.json();
+}
+
+function setLoading(on) {
+  const el = document.getElementById('loading-bar');
+  if (el) el.style.opacity = on ? '1' : '0';
+}
+
+async function cargarDatos() {
+  setLoading(true);
+  try {
+    const mes = mesKey(viewYear, viewMonth);
+    const r = await api({ accion:'getTodo', mes });
+    if (r.ok) {
+      personas = r.personas || [];
+      pagos    = r.pagos    || {};
+      limpieza = r.limpieza || {};
+      gastos   = r.gastos   || [];
+    }
+  } catch(e) { toast('Error cargando datos'); }
+  setLoading(false);
+  render();
+}
+
+(async function init() {
+  const now = new Date();
+  viewYear  = now.getFullYear();
+  viewMonth = now.getMonth();
+  calYear   = now.getFullYear();
+  calMonth  = now.getMonth();
+  document.getElementById('mes-selector').value = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}`;
+  updateMonthBadge();
+  await cargarDatos();
+})();
+
+/* ══ UTILS ══ */
+function mesKey(y, m) { return `${y}-${String(m+1).padStart(2,'0')}`; }
+function currentKey() { return mesKey(viewYear, viewMonth); }
+
+function fmt(n) {
+  return '$' + Math.abs(n).toLocaleString('es-CO');
+}
+
+function fmtDate(d) {
+  return new Date(d+'T00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'});
+}
+
+const COLORS = ['#3B82F6','#22C55E','#8B5CF6','#F59E0B','#EF4444','#EC4899','#14B8A6','#F97316'];
+
+function avatarLetter(nombre) { return nombre.trim().charAt(0).toUpperCase(); }
+
+function weekDates(year, month, week) {
+  // week 1=1-7, 2=8-14, 3=15-21, 4=22-end
+  const starts = [1, 8, 15, 22];
+  const start = starts[week-1];
+  const end = week===4 ? new Date(year, month+1, 0).getDate() : starts[week]-1;
+  return { start, end };
+}
+
+function updateMonthBadge() {
+  const names = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('currentMonthBadge').textContent = `${names[viewMonth]} ${viewYear}`;
+}
+
+/* ══ NAVIGATION ══ */
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const tabs = document.querySelectorAll('.tab');
+  const map = {resumen:0,personas:1,calendario:2,gastos:3,admin:4};
+  tabs[map[p]]?.classList.add('active');
+  render();
+}
+
+/* ══ RENDER MASTER ══ */
+function render() {
+  updateMonthBadge();
+  renderResumen();
+  renderPersonasPage();
+  renderCal();
+  renderGastos();
+  if (isAdmin) { renderAdminPays(); renderAdminClean(); renderAdminPersonas(); }
+}
+
+/* ══════════════════════════════
+   RESUMEN
+══════════════════════════════ */
+function renderResumen() {
+  const now = new Date();
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
+  const currentDay = isCurrentMonth ? now.getDate() : 32;
+  const key = currentKey();
+
+  const totalPagos = personas.filter(p => pagos[p.id]).length;
+  const recaudado = totalPagos * CUOTA;
+  const totalGastado = gastos.reduce((a,g) => a + g.monto, 0);
+  const totalRecaudadoHist = Object.keys(pagos).length * CUOTA;
+  const caja = (personas.filter(p=>pagos[p.id]).length * CUOTA) - gastos.filter(g=>g.fecha.startsWith(key)).reduce((a,g)=>a+g.monto,0);
+  const gastadoMes = gastos.filter(g=>g.fecha.startsWith(key)).reduce((a,g)=>a+g.monto,0);
+
+  const sinLimpiar = personas.filter(p => {
+    if (limpieza[p.id]) return false;
+    const { end } = weekDates(viewYear, viewMonth, p.semana);
+    return currentDay > end;
+  });
+  const totalMultas = sinLimpiar.length * MULTA;
+
+  // caja real = historico necesita datos de todos los meses; mostramos balance del mes
+  const totalRecaudadoReal = totalPagos * CUOTA;
+  const cajaReal = totalRecaudadoReal - gastadoMes;
+
+  document.getElementById('sum-recaudado').textContent = fmt(totalRecaudadoReal);
+  document.getElementById('sum-recaudado-note').textContent = `${totalPagos} de ${personas.length} han pagado`;
+  document.getElementById('sum-gastado').textContent = fmt(gastadoMes);
+  document.getElementById('sum-caja').textContent = (cajaReal>=0?'+':'-') + fmt(cajaReal);
+  document.getElementById('sum-multas').textContent = fmt(totalMultas);
+  document.getElementById('sum-multas-note').textContent = `${sinLimpiar.length} persona(s) sin limpiar`;
+
+  const pct = personas.length ? Math.round((totalPagos/personas.length)*100) : 0;
+  document.getElementById('prog-label').textContent = `${totalPagos} / ${personas.length} pagaron`;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-bar').style.width = pct + '%';
+
+  const cont = document.getElementById('resumen-people');
+  cont.innerHTML = personas.map(p => {
+    const pago = pagos[p.id];
+    const limpio = limpieza[p.id];
+    const { end } = weekDates(viewYear, viewMonth, p.semana);
+    const semanaPaso = currentDay > end;
+    const deuda = !limpio && semanaPaso;
+    return `
+    <div class="person-card">
+      <div class="person-top">
+        <div class="person-avatar" style="background:${p.color}">${avatarLetter(p.nombre)}</div>
+        <div class="person-info">
+          <div class="person-name">${p.nombre}</div>
+          <div class="person-week">Semana ${p.semana} de limpieza</div>
+        </div>
+      </div>
+      <div class="person-badges">
+        <span class="badge ${pago?'badge-green':'badge-red'}">${pago?'✓ Pagó':'✗ No ha pagado'}</span>
+        <span class="badge ${limpio?'badge-green':semanaPaso?'badge-red':'badge-sky'}">${limpio?'✓ Limpió':semanaPaso?'✗ No limpió':'⏳ Pendiente'}</span>
+      </div>
+      ${deuda ? `<div class="person-debt" style="display:block">Multa: ${fmt(MULTA)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════
+   PERSONAS PAGE
+══════════════════════════════ */
+function renderPersonasPage() {
+  const names = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('personas-mes').textContent = `${names[viewMonth]} ${viewYear}`;
+
+  const now = new Date();
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
+  const currentDay = isCurrentMonth ? now.getDate() : 32;
+
+  document.getElementById('personas-grid').innerHTML = personas.map(p => {
+    const pago = pagos[p.id];
+    const limpio = limpieza[p.id];
+    const { start, end } = weekDates(viewYear, viewMonth, p.semana);
+    const semanaPaso = currentDay > end;
+    const deuda = !limpio && semanaPaso;
+
+    return `
+    <div class="person-card">
+      <div class="person-top">
+        <div class="person-avatar" style="background:${p.color};width:50px;height:50px;font-size:22px">${avatarLetter(p.nombre)}</div>
+        <div class="person-info">
+          <div class="person-name" style="font-size:16px">${p.nombre}</div>
+          <div class="person-week">Limpieza: días ${start}–${end} del mes</div>
+        </div>
+      </div>
+      <div class="person-badges">
+        <span class="badge ${pago?'badge-green':'badge-red'}">${pago?'✓ Cuota pagada':'✗ Cuota pendiente: '+fmt(CUOTA)}</span>
+      </div>
+      <div class="person-badges">
+        <span class="badge ${limpio?'badge-green':semanaPaso?'badge-red':'badge-sky'}">${limpio?'✓ Limpió su semana':semanaPaso?'✗ No limpió — multa '+fmt(MULTA):'⏳ Semana por realizar'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════
+   CALENDARIO
+══════════════════════════════ */
+let calYear, calMonth;
+
+function calMove(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCal();
+}
+
+// helper global para que la tabla de semanas también pueda usarla
+function personaBySemana(w) {
+  return personas.find(p => Number(p.semana) === w);
+}
+
+function dayToWeek(d) {
+  if (d <= 7) return 1;
+  if (d <= 14) return 2;
+  if (d <= 21) return 3;
+  return 4;
+}
+
+function renderCal() {
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const mesNombre = MESES[calMonth] + ' ' + calYear;
+  document.getElementById('cal-title').textContent = mesNombre;
+  document.getElementById('cal-assign-mes').textContent = mesNombre;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date();
+  const dows = ['Do','Lu','Ma','Mi','Ju','Vi','Sá'];
+
+  let html = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  for (let i=0; i<firstDay; i++) html += `<div class="cal-day other"></div>`;
+
+  for (let d=1; d<=daysInMonth; d++) {
+    const isToday = d===today.getDate() && calMonth===today.getMonth() && calYear===today.getFullYear();
+    const week = dayToWeek(d);
+    const p = personaBySemana(week);
+    const name = p ? p.nombre.split(' ')[0] : '';
+    const showLabel = [1,8,15,22].includes(d);
+    html += `
+      <div class="cal-day ${isToday?'today':''}" style="${p&&!isToday?`background:${p.color}18;border:1.5px solid ${p.color}44`:''}">
+        ${d}
+        ${showLabel && p ? `<div class="week-label" style="${isToday?'':'color:'+p.color}">${name}</div>` : ''}
+      </div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+
+  // tabla de semanas con fechas reales
+  const now2 = new Date();
+  const isCurrentMonth = calYear === now2.getFullYear() && calMonth === now2.getMonth();
+  const currentDay = isCurrentMonth ? now2.getDate() : 32;
+
+  const tbody = document.getElementById('week-assign-body');
+  tbody.innerHTML = [1,2,3,4].map(w => {
+    const { start, end } = weekDates(calYear, calMonth, w);
+    // fechas reales con nombre de mes
+    const mesAbrev = MESES[calMonth].slice(0,3);
+    const rangoFechas = `${start} – ${end} ${mesAbrev} ${calYear}`;
+    const p = personaBySemana(w);
+    const limpio = p && limpieza[p.id];
+    const semanaPaso = currentDay > end;
+    const statusBadge = limpio
+      ? `<span class="badge badge-green">✓ Limpió</span>`
+      : semanaPaso
+        ? `<span class="badge badge-red">✗ No limpió — multa</span>`
+        : `<span class="badge badge-sky">⏳ Pendiente</span>`;
+
+    return `<tr>
+      <td><strong>Semana ${w}</strong></td>
+      <td style="color:var(--slate-mid)">${rangoFechas}</td>
+      <td>${p ? `<span style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:${p.color};display:inline-block"></span>${p.nombre}</span>` : '—'}</td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════
+   GASTOS
+══════════════════════════════ */
+function renderGastos() {
+  const tbody = document.getElementById('gastos-body');
+  if (gastos.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">🧺</div>Sin gastos registrados</div></td></tr>`;
+    return;
+  }
+  const sorted = [...gastos].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  tbody.innerHTML = sorted.map(g => `
+    <tr>
+      <td>${fmtDate(g.fecha)}</td>
+      <td>${g.desc}</td>
+      <td class="amount-red">${fmt(g.monto)}</td>
+      <td style="color:var(--slate-light)">${g.reg||'Admin'}</td>
+    </tr>
+  `).join('');
+}
+
+/* ══════════════════════════════
+   ADMIN PANEL
+══════════════════════════════ */
+function renderAdminPays() {
+  const cont = document.getElementById('pay-rows');
+  cont.innerHTML = personas.map(p => `
+    <div class="pay-row">
+      <div class="person-avatar" style="background:${p.color};width:34px;height:34px;font-size:15px;flex-shrink:0">${avatarLetter(p.nombre)}</div>
+      <div class="pay-name">${p.nombre}</div>
+      <div class="pay-toggle">
+        <span class="badge ${pagos[p.id]?'badge-green':'badge-red'}">${pagos[p.id]?'Pagó':'Pendiente'}</span>
+        <button class="btn btn-sm ${pagos[p.id]?'btn-ghost':'btn-green'}" onclick="togglePago('${p.id}')">
+          ${pagos[p.id]?'Desmarcar':'Marcar pagado'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAdminClean() {
+  const cont = document.getElementById('clean-rows');
+  const now = new Date();
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
+  const currentDay = isCurrentMonth ? now.getDate() : 32;
+
+  cont.innerHTML = personas.map(p => {
+    const { start, end } = weekDates(viewYear, viewMonth, p.semana);
+    const limpio = limpieza[p.id];
+    return `
+    <div class="pay-row">
+      <div class="person-avatar" style="background:${p.color};width:34px;height:34px;font-size:15px;flex-shrink:0">${avatarLetter(p.nombre)}</div>
+      <div class="pay-name">
+        ${p.nombre}
+        <div style="font-size:11px;color:var(--slate-light)">Semana ${p.semana} — días ${start}–${end}</div>
+      </div>
+      <div class="pay-toggle">
+        <span class="badge ${limpio?'badge-green':currentDay>end?'badge-red':'badge-sky'}">${limpio?'Limpió':currentDay>end?'Sin limpiar':'Pendiente'}</span>
+        <button class="btn btn-sm ${limpio?'btn-ghost':'btn-amber'}" onclick="toggleLimpieza('${p.id}')">
+          ${limpio?'Desmarcar':'Marcar limpió'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAdminPersonas() {
+  const cont = document.getElementById('personas-admin-list');
+  if (personas.length === 0) { cont.innerHTML = '<div class="empty">Sin personas registradas</div>'; return; }
+  cont.innerHTML = personas.map(p => `
+    <div class="pay-row">
+      <div class="person-avatar" style="background:${p.color};width:34px;height:34px;font-size:15px;flex-shrink:0">${avatarLetter(p.nombre)}</div>
+      <div class="pay-name">${p.nombre} <span style="color:var(--slate-light);font-size:12px">— Semana ${p.semana}</span></div>
+      <button class="btn btn-sm btn-red" onclick="deletePersona('${p.id}')">Eliminar</button>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════
+   ACTIONS
+══════════════════════════════ */
+async function togglePago(id) {
+  const valor = !pagos[id];
+  pagos[id] = valor;
+  render();
+  await apiPost({ accion:'togglePago', personaId:id, mes:currentKey(), valor });
+  toast(valor ? '✅ Pago registrado' : 'Pago desmarcado');
+}
+
+async function toggleLimpieza(id) {
+  const valor = !limpieza[id];
+  limpieza[id] = valor;
+  render();
+  await apiPost({ accion:'toggleLimpieza', personaId:id, mes:currentKey(), valor });
+  toast(valor ? '🧹 Limpieza registrada' : 'Limpieza desmarcada');
+}
+
+async function saveGasto() {
+  const fecha = document.getElementById('g-fecha').value;
+  const monto = parseFloat(document.getElementById('g-monto').value);
+  const desc  = document.getElementById('g-desc').value.trim();
+  if (!fecha || !monto || !desc) { toast('Completa todos los campos'); return; }
+  setLoading(true);
+  const r = await apiPost({ accion:'saveGasto', fecha, monto, desc });
+  if (r.ok) {
+    gastos.push({ id: r.id, fecha, monto, desc });
+    document.getElementById('g-fecha').value = '';
+    document.getElementById('g-monto').value = '';
+    document.getElementById('g-desc').value = '';
+    toast('🛒 Gasto registrado');
+    render();
+  } else { toast('Error guardando gasto'); }
+  setLoading(false);
+}
+
+async function changeMes() {
+  const val = document.getElementById('mes-selector').value;
+  if (!val) return;
+  const [y, m] = val.split('-').map(Number);
+  viewYear = y; viewMonth = m-1;
+  await cargarDatos();
+}
+
+async function resetToCurrentMonth() {
+  const now = new Date();
+  viewYear = now.getFullYear(); viewMonth = now.getMonth();
+  document.getElementById('mes-selector').value = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}`;
+  await cargarDatos();
+}
+
+/* ── PERSONAS ── */
+function openAddPersona() { openModal('modal-persona'); }
+
+async function savePersona() {
+  const nombre = document.getElementById('p-nombre').value.trim();
+  const semana = parseInt(document.getElementById('p-semana').value);
+  if (!nombre) { toast('Escribe un nombre'); return; }
+  const color = COLORS[personas.length % COLORS.length];
+  setLoading(true);
+  const r = await apiPost({ accion:'savePersona', nombre, semana, color });
+  if (r.ok) {
+    personas.push({ id: r.id, nombre, semana, color });
+    closeModal('modal-persona');
+    document.getElementById('p-nombre').value = '';
+    toast('👤 Persona agregada');
+    render();
+  } else { toast('Error guardando persona'); }
+  setLoading(false);
+}
+
+async function deletePersona(id) {
+  if (!confirm('¿Eliminar esta persona?')) return;
+  personas = personas.filter(p => String(p.id) !== String(id));
+  render();
+  await apiPost({ accion:'deletePersona', id });
+  toast('Persona eliminada');
+}
+
+/* ── ADMIN LOGIN ── */
+function openAdminLogin() {
+  if (isAdmin) { toast('Ya estás en modo admin'); showPage('admin'); return; }
+  openModal('modal-login');
+}
+
+function tryLogin() {
+  const val = document.getElementById('admin-pass').value;
+  if (val === ADMIN_PASS) {
+    isAdmin = true;
+    document.getElementById('adminTab').style.display = 'block';
+    closeModal('modal-login');
+    document.getElementById('admin-pass').value = '';
+    document.getElementById('g-fecha').value = new Date().toISOString().slice(0,10);
+    toast('✅ Bienvenido, admin');
+    showPage('admin');
+    render();
+  } else {
+    toast('❌ Contraseña incorrecta');
+  }
+}
+
+/* ── MODAL ── */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target===bg) bg.classList.remove('open'); });
+});
+
+// Prevent clicks inside modal from bubbling to modal-bg
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => e.stopPropagation());
+});
+
+/* ── TOAST ── */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
