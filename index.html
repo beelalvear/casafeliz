@@ -762,13 +762,11 @@ input:focus, select:focus { border-color: var(--sky); background: white; }
         <input type="text" id="p-nombre" placeholder="Nombre completo">
       </div>
       <div class="form-group full">
-        <label>Semana asignada para limpieza</label>
-        <select id="p-semana">
-          <option value="1">Semana 1 (días 1–7)</option>
-          <option value="2">Semana 2 (días 8–14)</option>
-          <option value="3">Semana 3 (días 15–21)</option>
-          <option value="4">Semana 4 (días 22–28/31)</option>
-        </select>
+        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#1E40AF;line-height:1.5">
+          El turno se asigna automáticamente. La persona entra al final de la
+          rotación y le tocará la siguiente semana libre.
+        </div>
+        <input type="hidden" id="p-semana" value="1">
       </div>
     </div>
     <div class="modal-footer">
@@ -882,6 +880,45 @@ const COLORS = ['#3B82F6','#22C55E','#8B5CF6','#F59E0B','#EF4444','#EC4899','#14
 
 function avatarLetter(nombre) { return nombre.trim().charAt(0).toUpperCase(); }
 
+/* ── ROTACIÓN CONTINUA DE TURNOS ──
+   Con 6 personas y 4 semanas por mes, los turnos ruedan al mes siguiente.
+   Cambia ROTACION_INICIO si quieres que la rotación arranque en otro mes. */
+const ROTACION_INICIO = { anio: 2026, mes: 8 }; // mes 8 = Septiembre
+
+function mesAbsoluto(y, m) { return y * 12 + m; }
+
+// ¿Qué persona limpia en la semana w de ese mes?
+function personaDeSemana(y, m, w) {
+  if (!personas.length) return null;
+  const slot = (mesAbsoluto(y, m) - mesAbsoluto(ROTACION_INICIO.anio, ROTACION_INICIO.mes)) * 4 + (w - 1);
+  const i = ((slot % personas.length) + personas.length) % personas.length;
+  return personas[i];
+}
+
+// ¿Qué semana le toca a esta persona en ese mes? null si no le toca
+function semanaDePersona(y, m, persona) {
+  for (let w = 1; w <= 4; w++) {
+    const p = personaDeSemana(y, m, w);
+    if (p && String(p.id) === String(persona.id)) return w;
+  }
+  return null;
+}
+
+// Texto con las fechas del próximo turno de una persona
+function proximoTurnoTexto(persona) {
+  const MM = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  for (let k = 1; k <= 12; k++) {
+    const d = new Date(viewYear, viewMonth + k, 1);
+    const y = d.getFullYear(), m = d.getMonth();
+    const w = semanaDePersona(y, m, persona);
+    if (w !== null) {
+      const r = weekDates(y, m, w);
+      return `Próximo turno: ${r.start}–${r.end} de ${MM[m]}`;
+    }
+  }
+  return '';
+}
+
 function weekDates(year, month, week) {
   // week 1=1-7, 2=8-14, 3=15-21, 4=22-end
   const starts = [1, 8, 15, 22];
@@ -934,7 +971,9 @@ function renderResumen() {
 
   const sinLimpiar = personas.filter(p => {
     if (limpieza[p.id]) return false;
-    const { end } = weekDates(viewYear, viewMonth, p.semana);
+    const w = semanaDePersona(viewYear, viewMonth, p);
+    if (w === null) return false;           // no le tocaba este mes
+    const { end } = weekDates(viewYear, viewMonth, w);
     return currentDay > end;
   });
   const totalMultas = sinLimpiar.length * MULTA;
@@ -959,21 +998,30 @@ function renderResumen() {
   cont.innerHTML = personas.map(p => {
     const pago = pagos[p.id];
     const limpio = limpieza[p.id];
-    const { end } = weekDates(viewYear, viewMonth, p.semana);
-    const semanaPaso = currentDay > end;
-    const deuda = !limpio && semanaPaso;
+    const w = semanaDePersona(viewYear, viewMonth, p);
+    const leToca = w !== null;
+    const end = leToca ? weekDates(viewYear, viewMonth, w).end : 0;
+    const semanaPaso = leToca && currentDay > end;
+    const deuda = leToca && !limpio && semanaPaso;
+
+    let badgeLimpieza;
+    if (!leToca)          badgeLimpieza = '';
+    else if (limpio)      badgeLimpieza = `<span class="badge badge-green">✓ Limpió</span>`;
+    else if (semanaPaso)  badgeLimpieza = `<span class="badge badge-red">✗ No limpió</span>`;
+    else                  badgeLimpieza = `<span class="badge badge-sky">⏳ Pendiente</span>`;
+
     return `
     <div class="person-card">
       <div class="person-top">
         <div class="person-avatar" style="background:${p.color}">${avatarLetter(p.nombre)}</div>
         <div class="person-info">
           <div class="person-name">${p.nombre}</div>
-          <div class="person-week">Semana ${p.semana} de limpieza</div>
+          <div class="person-week">${leToca ? `Días ${weekDates(viewYear,viewMonth,w).start}–${weekDates(viewYear,viewMonth,w).end}` : proximoTurnoTexto(p)}</div>
         </div>
       </div>
       <div class="person-badges">
         <span class="badge ${pago?'badge-green':'badge-red'}">${pago?'✓ Pagó':'✗ No ha pagado'}</span>
-        <span class="badge ${limpio?'badge-green':semanaPaso?'badge-red':'badge-sky'}">${limpio?'✓ Limpió':semanaPaso?'✗ No limpió':'⏳ Pendiente'}</span>
+        ${badgeLimpieza}
       </div>
       ${deuda ? `<div class="person-debt" style="display:block">Multa: ${fmt(MULTA)}</div>` : ''}
     </div>`;
@@ -994,9 +1042,18 @@ function renderPersonasPage() {
   document.getElementById('personas-grid').innerHTML = personas.map(p => {
     const pago = pagos[p.id];
     const limpio = limpieza[p.id];
-    const { start, end } = weekDates(viewYear, viewMonth, p.semana);
-    const semanaPaso = currentDay > end;
-    const deuda = !limpio && semanaPaso;
+    const w = semanaDePersona(viewYear, viewMonth, p);
+    const leToca = w !== null;
+    const rango = leToca ? weekDates(viewYear, viewMonth, w) : null;
+    const semanaPaso = leToca && currentDay > rango.end;
+
+    const proximoTurno = leToca ? '' : proximoTurnoTexto(p);
+
+    let badgeLimpieza;
+    if (!leToca)         badgeLimpieza = '';
+    else if (limpio)     badgeLimpieza = `<span class="badge badge-green">✓ Limpió su semana</span>`;
+    else if (semanaPaso) badgeLimpieza = `<span class="badge badge-red">✗ No limpió — Paga limpieza ${fmt(MULTA)}</span>`;
+    else                 badgeLimpieza = `<span class="badge badge-sky">⏳ Semana por realizar</span>`;
 
     return `
     <div class="person-card">
@@ -1004,14 +1061,14 @@ function renderPersonasPage() {
         <div class="person-avatar" style="background:${p.color};width:50px;height:50px;font-size:22px">${avatarLetter(p.nombre)}</div>
         <div class="person-info">
           <div class="person-name" style="font-size:16px">${p.nombre}</div>
-          <div class="person-week">Limpieza: días ${start}–${end} del mes</div>
+          <div class="person-week">${leToca ? `Limpieza: días ${rango.start}–${rango.end}` : proximoTurno}</div>
         </div>
       </div>
       <div class="person-badges">
         <span class="badge ${pago?'badge-green':'badge-red'}">${pago?'✓ Cuota pagada':'✗ Cuota pendiente: '+fmt(CUOTA)}</span>
       </div>
       <div class="person-badges">
-        <span class="badge ${limpio?'badge-green':semanaPaso?'badge-red':'badge-sky'}">${limpio?'✓ Limpió su semana':semanaPaso?'✗ No limpió — multa '+fmt(MULTA):'⏳ Semana por realizar'}</span>
+        ${badgeLimpieza}
       </div>
     </div>`;
   }).join('');
@@ -1029,8 +1086,8 @@ function calMove(dir) {
 }
 
 // helper global para que la tabla de semanas también pueda usarla
-function personaBySemana(w) {
-  return personas.find(p => Number(p.semana) === w);
+function personaBySemana(w, y, m) {
+  return personaDeSemana(y !== undefined ? y : calYear, m !== undefined ? m : calMonth, w);
 }
 
 function dayToWeek(d) {
@@ -1058,7 +1115,7 @@ function renderCal() {
   for (let d=1; d<=daysInMonth; d++) {
     const isToday = d===today.getDate() && calMonth===today.getMonth() && calYear===today.getFullYear();
     const week = dayToWeek(d);
-    const p = personaBySemana(week);
+    const p = personaBySemana(week, calYear, calMonth);
     const name = p ? p.nombre.split(' ')[0] : '';
     const showLabel = [1,8,15,22].includes(d);
     html += `
@@ -1081,13 +1138,13 @@ function renderCal() {
     // fechas reales con nombre de mes
     const mesAbrev = MESES[calMonth].slice(0,3);
     const rangoFechas = `${start} – ${end} ${mesAbrev} ${calYear}`;
-    const p = personaBySemana(w);
+    const p = personaBySemana(w, calYear, calMonth);
     const limpio = p && limpieza[p.id];
     const semanaPaso = currentDay > end;
     const statusBadge = limpio
       ? `<span class="badge badge-green">✓ Limpió</span>`
       : semanaPaso
-        ? `<span class="badge badge-red">✗ No limpió — multa</span>`
+        ? `<span class="badge badge-red">✗ No limpió — Paga limpieza</span>`
         : `<span class="badge badge-sky">⏳ Pendiente</span>`;
 
     return `<tr>
@@ -1145,14 +1202,28 @@ function renderAdminClean() {
   const currentDay = isCurrentMonth ? now.getDate() : 32;
 
   cont.innerHTML = personas.map(p => {
-    const { start, end } = weekDates(viewYear, viewMonth, p.semana);
+    const w = semanaDePersona(viewYear, viewMonth, p);
+    const leToca = w !== null;
     const limpio = limpieza[p.id];
+
+    if (!leToca) {
+      return `
+      <div class="pay-row" style="opacity:.5">
+        <div class="person-avatar" style="background:${p.color};width:34px;height:34px;font-size:15px;flex-shrink:0">${avatarLetter(p.nombre)}</div>
+        <div class="pay-name">
+          ${p.nombre}
+          <div style="font-size:11px;color:var(--slate-light)">${proximoTurnoTexto(p)}</div>
+        </div>
+      </div>`;
+    }
+
+    const { start, end } = weekDates(viewYear, viewMonth, w);
     return `
     <div class="pay-row">
       <div class="person-avatar" style="background:${p.color};width:34px;height:34px;font-size:15px;flex-shrink:0">${avatarLetter(p.nombre)}</div>
       <div class="pay-name">
         ${p.nombre}
-        <div style="font-size:11px;color:var(--slate-light)">Semana ${p.semana} — días ${start}–${end}</div>
+        <div style="font-size:11px;color:var(--slate-light)">Semana ${w} — días ${start}–${end}</div>
       </div>
       <div class="pay-toggle">
         <span class="badge ${limpio?'badge-green':currentDay>end?'badge-red':'badge-sky'}">${limpio?'Limpió':currentDay>end?'Sin limpiar':'Pendiente'}</span>
@@ -1170,7 +1241,7 @@ function renderAdminPersonas() {
   cont.innerHTML = personas.map(p => `
     <div class="pay-row">
       <div class="person-avatar" style="background:${p.color};width:34px;height:34px;font-size:15px;flex-shrink:0">${avatarLetter(p.nombre)}</div>
-      <div class="pay-name">${p.nombre} <span style="color:var(--slate-light);font-size:12px">— Semana ${p.semana}</span></div>
+      <div class="pay-name">${p.nombre} <span style="color:var(--slate-light);font-size:12px">— Turno #${personas.indexOf(p)+1} en la rotación</span></div>
       <button class="btn btn-sm btn-red" onclick="deletePersona('${p.id}')">Eliminar</button>
     </div>
   `).join('');
